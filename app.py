@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-CARPETA = r"C:\Users\MASTER\OneDrive\Documentos\Nueva carpeta"
+CARPETA = os.path.dirname(os.path.abspath(__file__))
 
 ARCHIVO_BASE = os.path.join(CARPETA, "BASE DE DATOS CALIDAD Y TÉCNICO.csv")
 ARCHIVO_ASISTENCIA = os.path.join(CARPETA, "REGISTRO_ASISTENCIA.csv")
@@ -151,4 +151,5 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)

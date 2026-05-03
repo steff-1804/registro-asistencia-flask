@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Asistencia</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .contenedor {
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 430px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: #111;
+        }
+
+        p {
+            color: #444;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            text-align: center;
+            border: 2px solid #222;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #084298;
+        }
+
+        .mensaje {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .exito {
+            background: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="contenedor">
+        <h1>Registro de Asistencia</h1>
+        <p>Ingrese su número de cédula para registrar su asistencia.</p>
+
+        <form method="POST">
+            <input 
+                type="text" 
+                name="cedula" 
+                placeholder="Número de cédula"
+                required 
+                autofocus
+            >
+
+            <button type="submit">Registrar asistencia</button>
+        </form>
+
+        {% if mensaje %}
+            <div class="mensaje {{ tipo }}">
+                {{ mensaje | safe }}
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
