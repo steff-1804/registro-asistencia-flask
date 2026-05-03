@@ -1,5 +1,4 @@
 Flask
 pandas
 gunicorn
-gspread
-google-auth
+requests
