@@ -20,7 +20,7 @@
             padding: 40px;
             border-radius: 18px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 430px;
+            width: 520px;
             text-align: center;
         }
 
@@ -33,17 +33,52 @@
         p {
             color: #444;
             font-size: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 15px;
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
             border: 2px solid #222;
             border-radius: 10px;
             box-sizing: border-box;
+            margin-top: 8px;
+        }
+
+        .opciones {
+            margin: 20px 0;
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .opciones label {
+            display: block;
+            margin: 10px 0;
+            font-size: 16px;
+            color: #222;
+            cursor: pointer;
+        }
+
+        .opciones input {
+            width: auto;
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        .bloque-anterior {
+            display: none;
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .bloque-anterior label {
+            font-weight: bold;
+            font-size: 15px;
         }
 
         button {
@@ -85,6 +120,13 @@
             text-align: center;
             font-weight: bold;
         }
+
+        .nota {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            text-align: left;
+        }
     </style>
 </head>
 
@@ -103,6 +145,47 @@
                 autofocus
             >
 
+            <div class="opciones">
+                <label>
+                    <input 
+                        type="radio" 
+                        name="modo_registro" 
+                        value="hoy" 
+                        checked
+                        onclick="mostrarOpciones()"
+                    >
+                    Registrar asistencia de hoy
+                </label>
+
+                <label>
+                    <input 
+                        type="radio" 
+                        name="modo_registro" 
+                        value="anterior"
+                        onclick="mostrarOpciones()"
+                    >
+                    Registrar asistencia de días anteriores
+                </label>
+            </div>
+
+            <div id="bloqueAnterior" class="bloque-anterior">
+                <label for="charla_anterior">Seleccione la fecha y el tema:</label>
+
+                <select name="charla_anterior" id="charla_anterior">
+                    <option value="">Seleccione una opción</option>
+
+                    {% for opcion in opciones_charlas %}
+                        <option value="{{ opcion.valor }}">
+                            {{ opcion.texto }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <div class="nota">
+                    Solo podrá registrar temas que correspondan a su misma área.
+                </div>
+            </div>
+
             <button type="submit">Registrar asistencia</button>
         </form>
 
@@ -112,6 +195,21 @@
             </div>
         {% endif %}
     </div>
+
+    <script>
+        function mostrarOpciones() {
+            const modo = document.querySelector('input[name="modo_registro"]:checked').value;
+            const bloqueAnterior = document.getElementById("bloqueAnterior");
+
+            if (modo === "anterior") {
+                bloqueAnterior.style.display = "block";
+            } else {
+                bloqueAnterior.style.display = "none";
+            }
+        }
+
+        mostrarOpciones();
+    </script>
 
 </body>
 </html>
