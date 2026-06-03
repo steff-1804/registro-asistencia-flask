@@ -46,10 +46,33 @@ def normalizar_texto(texto):
 
 
 def leer_csv_seguro(ruta):
+    """
+    Lee archivos CSV aunque estén separados por coma o punto y coma.
+
+    IMPORTANTE:
+    - Si tu CHARLAS.csv tiene comas dentro del nombre de la charla,
+      lo más recomendable es guardar el CSV separado por punto y coma (;).
+    - Esta función intenta detectar automáticamente el separador.
+    """
+
     try:
-        return pd.read_csv(ruta, dtype=str, encoding="utf-8-sig")
+        return pd.read_csv(
+            ruta,
+            dtype=str,
+            encoding="utf-8-sig",
+            sep=None,
+            engine="python",
+            on_bad_lines="skip"
+        )
     except UnicodeDecodeError:
-        return pd.read_csv(ruta, dtype=str, encoding="latin1")
+        return pd.read_csv(
+            ruta,
+            dtype=str,
+            encoding="latin1",
+            sep=None,
+            engine="python",
+            on_bad_lines="skip"
+        )
 
 
 def escapar_formula_airtable(texto):
@@ -118,7 +141,10 @@ def cargar_charlas():
 
     for columna in columnas_requeridas:
         if columna not in df.columns:
-            return None, f"No se encontró la columna '{columna}' en CHARLAS.csv."
+            return None, (
+                f"No se encontró la columna '{columna}' en CHARLAS.csv. "
+                f"Columnas encontradas: {list(df.columns)}"
+            )
 
     df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce").dt.strftime("%Y-%m-%d")
     df["Area"] = df["Area"].astype(str).str.strip()
@@ -144,7 +170,13 @@ def obtener_opciones_charlas():
         area = str(fila["Area"]).strip()
         charla = str(fila["Charla"]).strip()
 
-        if fecha and area and charla and charla.lower() != "nan":
+        if (
+            fecha
+            and area
+            and charla
+            and charla.lower() != "nan"
+            and area.lower() != "nan"
+        ):
             opciones.append({
                 "valor": f"{fecha}|||{area}|||{charla}",
                 "texto": f"{fecha} - {area} - {charla}"
