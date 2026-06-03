@@ -20,12 +20,12 @@
             padding: 40px;
             border-radius: 18px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 520px;
+            width: 540px;
             text-align: center;
         }
 
         h1 {
-            font-size: 28px;
+            font-size: 30px;
             margin-bottom: 12px;
             color: #111;
         }
@@ -33,7 +33,7 @@
         p {
             color: #444;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         input, select {
@@ -44,22 +44,21 @@
             border: 2px solid #222;
             border-radius: 10px;
             box-sizing: border-box;
-            margin-top: 8px;
         }
 
         .opciones {
-            margin: 20px 0;
+            margin: 25px 0;
             text-align: left;
             background: #f8f9fa;
             border-radius: 12px;
-            padding: 15px;
+            padding: 18px;
             border: 1px solid #ddd;
         }
 
         .opciones label {
             display: block;
-            margin: 10px 0;
-            font-size: 16px;
+            margin: 12px 0;
+            font-size: 17px;
             color: #222;
             cursor: pointer;
         }
@@ -72,13 +71,19 @@
 
         .bloque-anterior {
             display: none;
-            margin-top: 15px;
+            margin-top: 18px;
             text-align: left;
         }
 
         .bloque-anterior label {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .bloque-anterior select {
+            text-align: center;
         }
 
         button {
@@ -125,6 +130,17 @@
             font-size: 13px;
             color: #555;
             margin-top: 8px;
+            text-align: left;
+        }
+
+        .alerta {
+            background: #fff3cd;
+            color: #664d03;
+            border: 1px solid #ffecb5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
             text-align: left;
         }
     </style>
@@ -180,6 +196,14 @@
                         </option>
                     {% endfor %}
                 </select>
+
+                {% if opciones_charlas|length == 0 %}
+                    <div class="alerta">
+                        No se encontraron charlas cargadas. Revise que el archivo 
+                        <strong>CHARLAS.csv</strong> exista en GitHub y tenga las columnas:
+                        <strong>Fecha, Area, Charla</strong>.
+                    </div>
+                {% endif %}
 
                 <div class="nota">
                     Solo podrá registrar temas que correspondan a su misma área.
