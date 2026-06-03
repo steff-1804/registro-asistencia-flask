@@ -10,7 +10,7 @@ from urllib.parse import quote
 app = Flask(__name__)
 
 # ==========================================================
-# RUTAS LOCALES
+# RUTAS DE ARCHIVOS
 # ==========================================================
 
 CARPETA = os.path.dirname(os.path.abspath(__file__))
@@ -52,13 +52,17 @@ def leer_csv_seguro(ruta):
         return pd.read_csv(ruta, dtype=str, encoding="latin1")
 
 
+def escapar_formula_airtable(texto):
+    return str(texto).replace("'", "\\'")
+
+
 # ==========================================================
 # BASE DE PERSONAL
 # ==========================================================
 
 def cargar_base_datos():
     if not os.path.exists(ARCHIVO_BASE):
-        raise FileNotFoundError(f"No se encontró el archivo: {ARCHIVO_BASE}")
+        raise FileNotFoundError(f"No se encontró el archivo base: {ARCHIVO_BASE}")
 
     df = leer_csv_seguro(ARCHIVO_BASE)
     df.columns = df.columns.str.strip()
@@ -101,39 +105,46 @@ def buscar_persona(cedula):
 
 def cargar_charlas():
     if not os.path.exists(ARCHIVO_CHARLAS):
-        raise FileNotFoundError(f"No se encontró el archivo: {ARCHIVO_CHARLAS}")
+        return None, f"No se encontró el archivo de charlas: {ARCHIVO_CHARLAS}"
 
-    df = leer_csv_seguro(ARCHIVO_CHARLAS)
+    try:
+        df = leer_csv_seguro(ARCHIVO_CHARLAS)
+    except Exception as e:
+        return None, f"No se pudo leer CHARLAS.csv: {e}"
+
     df.columns = df.columns.str.strip()
 
     columnas_requeridas = ["Fecha", "Area", "Charla"]
 
     for columna in columnas_requeridas:
         if columna not in df.columns:
-            raise ValueError(f"No se encontró la columna '{columna}' en CHARLAS.csv")
+            return None, f"No se encontró la columna '{columna}' en CHARLAS.csv."
 
     df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce").dt.strftime("%Y-%m-%d")
+    df["Area"] = df["Area"].astype(str).str.strip()
+    df["Charla"] = df["Charla"].astype(str).str.strip()
     df["Area_Normalizada"] = df["Area"].apply(normalizar_texto)
 
-    return df
+    df = df.dropna(subset=["Fecha"])
+
+    return df, None
 
 
 def obtener_opciones_charlas():
-    try:
-        df = cargar_charlas()
-    except Exception:
+    df, error = cargar_charlas()
+
+    if error:
+        print("ERROR CHARLAS:", error)
         return []
 
     opciones = []
-
-    df = df.dropna(subset=["Fecha"])
 
     for _, fila in df.iterrows():
         fecha = str(fila["Fecha"]).strip()
         area = str(fila["Area"]).strip()
         charla = str(fila["Charla"]).strip()
 
-        if fecha and area and charla:
+        if fecha and area and charla and charla.lower() != "nan":
             opciones.append({
                 "valor": f"{fecha}|||{area}|||{charla}",
                 "texto": f"{fecha} - {area} - {charla}"
@@ -144,22 +155,22 @@ def obtener_opciones_charlas():
     return opciones
 
 
-def buscar_charla_por_fecha_area(fecha, area):
-    try:
-        df = cargar_charlas()
-    except Exception as e:
-        return None, f"Error al cargar las charlas: {e}"
+def buscar_charla_del_dia_por_area(area_persona):
+    df, error = cargar_charlas()
 
-    fecha = str(fecha).strip()
-    area_normalizada = normalizar_texto(area)
+    if error:
+        return None, error
+
+    fecha_actual = ahora_ecuador().strftime("%Y-%m-%d")
+    area_persona_normalizada = normalizar_texto(area_persona)
 
     resultado = df[
-        (df["Fecha"] == fecha) &
-        (df["Area_Normalizada"] == area_normalizada)
+        (df["Fecha"] == fecha_actual) &
+        (df["Area_Normalizada"] == area_persona_normalizada)
     ]
 
     if resultado.empty:
-        return None, f"No se encontró una charla para la fecha {fecha} y el área {area}."
+        return None, f"No se encontró una charla para hoy ({fecha_actual}) y el área {area_persona}."
 
     charla = str(resultado.iloc[0]["Charla"]).strip()
 
@@ -187,10 +198,10 @@ def validar_charla_anterior(valor_charla, area_persona):
 
 def airtable_headers():
     if not AIRTABLE_TOKEN:
-        raise ValueError("No se encontró AIRTABLE_TOKEN en Render o en las variables de entorno.")
+        raise ValueError("No se encontró AIRTABLE_TOKEN en Render.")
 
     if not AIRTABLE_BASE_ID:
-        raise ValueError("No se encontró AIRTABLE_BASE_ID en Render o en las variables de entorno.")
+        raise ValueError("No se encontró AIRTABLE_BASE_ID en Render.")
 
     return {
         "Authorization": f"Bearer {AIRTABLE_TOKEN}",
@@ -207,22 +218,27 @@ def verificar_duplicado_airtable(cedula, fecha, charla):
     url = airtable_url()
     headers = airtable_headers()
 
+    cedula_segura = escapar_formula_airtable(cedula)
+    fecha_segura = escapar_formula_airtable(fecha)
+    charla_segura = escapar_formula_airtable(charla)
+
     formula = (
-        f"AND("
-        f"{{Cedula}}='{cedula}',"
-        f"{{Fecha}}='{fecha}',"
-        f"{{Charla}}='{charla}'"
-        f")"
+        "AND("
+        f"{{Cedula}}='{cedula_segura}',"
+        f"DATETIME_FORMAT({{Fecha}}, 'YYYY-MM-DD')='{fecha_segura}',"
+        f"{{Charla}}='{charla_segura}'"
+        ")"
     )
 
-    params = {
-        "filterByFormula": formula
-    }
+    params = {"filterByFormula": formula}
 
     respuesta = requests.get(url, headers=headers, params=params, timeout=20)
 
     if respuesta.status_code != 200:
-        raise Exception(f"Error verificando duplicados en Airtable: {respuesta.status_code} - {respuesta.text}")
+        raise Exception(
+            f"Error verificando duplicados en Airtable: "
+            f"{respuesta.status_code} - {respuesta.text}"
+        )
 
     data = respuesta.json()
     registros = data.get("records", [])
@@ -342,7 +358,7 @@ def index():
 
         if modo_registro == "hoy":
             fecha = ahora_ecuador().strftime("%Y-%m-%d")
-            charla, error_charla = buscar_charla_por_fecha_area(fecha, area)
+            charla, error_charla = buscar_charla_del_dia_por_area(area)
 
             if error_charla:
                 mensaje = error_charla
