@@ -1,24 +1,3 @@
-Fecha,Area,Charla
-2026-05-04,CALIDAD,Gestión de Incidentes
-2026-05-05,CALIDAD,Control de Electricidad Estatica
-2026-05-06,CALIDAD,Separación de Residuos
-2026-05-07,CALIDAD, Equipos de Protección Personal (EPP)
-2026-05-08,CALIDAD,Trips - Tropiezos
-2026-05-11,CALIDAD,Trips - Control de energías peligrosas
-2026-05-12,CALIDAD,Trips - Seguridad con montacargas
-2026-05-13,CALIDAD,Trips - Gestion de Residuos
-2026-05-14,CALIDAD,Trips - Higiene industrial y almacenamiento seguro de isocianatos
-2026-05-15,CALIDAD,Trips - TLCFS: CUTS-CORTES
-2026-05-18,CALIDAD,Trips - Tareas que requieren el uso de gafas de vision 
-2026-05-19,CALIDAD,Trips - Seguridad en resinas
-2026-05-20,CALIDAD,Trips - Tipos de MOC
-2026-05-21,CALIDAD,Trips - Prevención de Derrames
-2026-05-22,CALIDAD,Trips - Casi accidente (Near Miss)
-2026-05-25,CALIDAD,Trips - Aseguramiento de la carga
-2026-05-26,CALIDAD,Trips - Cáncer de Piel: Diagnóstico Precoz y Cuidados
-2026-05-27,CALIDAD,Trips - Uso de Adornos
-2026-05-28,CALIDAD,Trips - TLCFS: Resbalones Tropiezos y Caídas
-2026-05-29,CALIDAD,Trips - Entrada en Espacios Confinados
 2026-06-01,CALIDAD,Diabetes
 2026-06-02,CALIDAD,protección de máquinas
 2026-06-03,CALIDAD, TLCFS-Tropiezos
@@ -34,3 +13,8 @@ Fecha,Area,Charla
 2026-06-17,CALIDAD,Prevención de Derrames
 2026-06-18,CALIDAD,Programa de Comunicación de Peligros
 2026-06-19,CALIDAD,TLCFS: Lifts - Levantamientos
+2026-06-22,CALIDAD,TLCFS: Tropezones
+2026-06-23,CALIDAD,EHSMS – Tipo de MOC
+2026-06-24,CALIDAD,SAF – Trabajo en Altura
+2026-06-25,CALIDAD,EHSMS – Plan de Emergencia
+2026-06-26,CALIDAD,ENV - Gestión de la Calidad del Aire
